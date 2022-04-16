@@ -15,6 +15,7 @@ def define_targets(rules):
         tags = [
             "supermodule:android/default/pytorch",
             "supermodule:ios/default/public.pytorch",
+            "xplat",
         ],
         visibility = ["//visibility:public"],
         deps = [
@@ -23,4 +24,17 @@ def define_targets(rules):
             "//third-party/glog:glog",
             "//xplat/caffe2/c10:c10",
         ],
+    )
+
+    rules.genrule(
+        name = "version_h",
+        srcs = [
+            ":torch/csrc/api/include/torch/version.h.in",
+            ":version.txt",
+        ],
+        outs = ["torch/csrc/api/include/torch/version.h"],
+        cmd = "$(location //tools/setup_helpers:gen_version_header) " +
+              "--template-path $(location :torch/csrc/api/include/torch/version.h.in) " +
+              "--version-path $(location :version.txt) --output-path $@ ",
+        tools = ["//tools/setup_helpers:gen_version_header"],
     )
